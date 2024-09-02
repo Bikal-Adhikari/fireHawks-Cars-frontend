@@ -1,5 +1,4 @@
 import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { saveAs } from 'file-saver';
 import { Car } from 'src/app/models/car';
 import { AuthService } from 'src/app/services/auth.service';
 import { CarService } from 'src/app/services/car.service';
@@ -109,8 +108,8 @@ export class HomeComponent implements OnInit {
     const key = this.sortKey as keyof Car;
     const order = this.sortOrder === 'asc' ? 1 : -1;
 
-    const aValue = a[key] ?? ''; // Default to empty string if undefined
-    const bValue = b[key] ?? ''; // Default to empty string if undefined
+    const aValue = a[key] ?? '';
+    const bValue = b[key] ?? '';
 
     if (aValue < bValue) return -1 * order;
     if (aValue > bValue) return 1 * order;
@@ -161,7 +160,14 @@ export class HomeComponent implements OnInit {
   exportToCSV(): void {
     const csvData = this.convertToCSV(this.filteredCars);
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    saveAs(blob, 'car-data.csv');
+    const url = window.URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.setAttribute('download', 'car-data.csv');
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    window.URL.revokeObjectURL(url);
   }
 
   convertToCSV(data: Car[]): string {
