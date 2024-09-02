@@ -1,0 +1,21 @@
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.table-container {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.mat-header-cell,
+.mat-cell {
+  text-align: left;
+  padding: 8px;
+}

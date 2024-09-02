@@ -1,3 +1,165 @@
-<ng-container *ngIf="authService.currentUser$ | async as user">
-  <h1>Welcome to the home page, {{ user.displayName }}!</h1>
-</ng-container>
+<div class="container mt-4">
+  <!-- Search Input -->
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <input
+      type="text"
+      class="form-control w-25"
+      placeholder="Search by name..."
+      [(ngModel)]="searchQuery"
+      (input)="applyFilters()"
+    />
+    <!-- Feature Buttons -->
+    <div>
+      <button class="btn btn-primary mr-2" (click)="openFilterModal()">
+        Filter
+      </button>
+      <button class="btn btn-secondary mr-2" (click)="openSortModal()">
+        Sort
+      </button>
+      <button class="btn btn-success mr-2" (click)="openAddDataModal()">
+        Add Data
+      </button>
+      <button class="btn btn-info" (click)="exportToCSV()">Download CSV</button>
+    </div>
+  </div>
+
+  <!-- Car Data Table -->
+  <table mat-table [dataSource]="filteredCars" class="mat-elevation-z8" matSort>
+    <!-- Name Column -->
+    <ng-container matColumnDef="name">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Name</th>
+      <td mat-cell *matCellDef="let car">{{ car.name }}</td>
+    </ng-container>
+
+    <!-- MPG Column -->
+    <ng-container matColumnDef="mpg">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>MPG</th>
+      <td mat-cell *matCellDef="let car">{{ car.mpg }}</td>
+    </ng-container>
+
+    <!-- Cylinders Column -->
+    <ng-container matColumnDef="cylinders">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Cylinders</th>
+      <td mat-cell *matCellDef="let car">{{ car.cylinders }}</td>
+    </ng-container>
+
+    <!-- Displacement Column -->
+    <ng-container matColumnDef="displacement">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Displacement</th>
+      <td mat-cell *matCellDef="let car">{{ car.displacement }}</td>
+    </ng-container>
+
+    <!-- Horsepower Column -->
+    <ng-container matColumnDef="horsepower">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Horsepower</th>
+      <td mat-cell *matCellDef="let car">{{ car.horsepower }}</td>
+    </ng-container>
+
+    <!-- Weight Column -->
+    <ng-container matColumnDef="weight">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Weight</th>
+      <td mat-cell *matCellDef="let car">{{ car.weight }}</td>
+    </ng-container>
+
+    <!-- Acceleration Column -->
+    <ng-container matColumnDef="acceleration">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Acceleration</th>
+      <td mat-cell *matCellDef="let car">{{ car.acceleration }}</td>
+    </ng-container>
+
+    <!-- Model Year Column -->
+    <ng-container matColumnDef="model_year">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Model Year</th>
+      <td mat-cell *matCellDef="let car">{{ car.model_year }}</td>
+    </ng-container>
+
+    <!-- Origin Column -->
+    <ng-container matColumnDef="origin">
+      <th mat-header-cell *matHeaderCellDef mat-sort-header>Origin</th>
+      <td mat-cell *matCellDef="let car">{{ car.origin }}</td>
+    </ng-container>
+
+    <!-- Header and Row Definitions -->
+    <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+    <tr mat-row *matRowDef="let row; columns: displayedColumns"></tr>
+  </table>
+</div>
+
+<!-- Filter Modal -->
+<ng-template #filterModal>
+  <div class="modal-header">
+    <h5 class="modal-title">Filter Cars</h5>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- Use the filterKeys array to loop through keys -->
+    <div *ngFor="let key of filterKeys">
+      <label>{{ key }}</label>
+      <input
+        type="text"
+        [(ngModel)]="filters[key]"
+        class="form-control"
+        aria-label="filterKeys"
+      />
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      Close
+    </button>
+    <button type="button" class="btn btn-primary" (click)="applyFilters()">
+      Apply Filters
+    </button>
+  </div>
+</ng-template>
+
+<!-- Sort Modal -->
+<ng-template #sortModal>
+  <div class="modal-header">
+    <h5 class="modal-title">Sort Cars</h5>
+    <button
+      type="button"
+      class="close"
+      aria-label="Close"
+      (click)="closeModal()"
+    >
+      <span aria-hidden="true">&times;</span>
+    </button>
+  </div>
+  <div class="modal-body">
+    <!-- Add sort options here -->
+    <div>
+      <label for="sortKey">Sort By:</label>
+      <select id="sortKey" [(ngModel)]="sortKey" class="form-control">
+        <option
+          *ngFor="let key of ['name', 'mpg', 'cylinders', 'displacement']"
+          [value]="key"
+        >
+          {{ key }}
+        </option>
+      </select>
+    </div>
+    <div>
+      <label for="sortOrder">Order:</label>
+      <select id="sortOrder" [(ngModel)]="sortOrder" class="form-control">
+        <option value="asc">Ascending</option>
+        <option value="desc">Descending</option>
+      </select>
+    </div>
+  </div>
+  <div class="modal-footer">
+    <button type="button" class="btn btn-secondary" (click)="closeModal()">
+      Close
+    </button>
+    <button type="button" class="btn btn-primary" (click)="applyFilters()">
+      Apply Sort
+    </button>
+  </div>
+</ng-template>
