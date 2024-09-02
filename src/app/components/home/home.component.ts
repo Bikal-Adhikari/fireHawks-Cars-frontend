@@ -1,9 +1,16 @@
-import { Component, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import {
+  Component,
+  OnInit,
+  TemplateRef,
+  ViewChild,
+  ChangeDetectorRef,
+} from '@angular/core';
 import { Car } from 'src/app/models/car';
 import { AuthService } from 'src/app/services/auth.service';
 import { CarService } from 'src/app/services/car.service';
 import { UsersService } from 'src/app/services/users.service';
 import { MatDialog } from '@angular/material/dialog';
+import { MatTableDataSource } from '@angular/material/table';
 
 @Component({
   selector: 'app-home',
@@ -15,6 +22,8 @@ export class HomeComponent implements OnInit {
   cars: Car[] = [];
   filteredCars: Car[] = [];
   filters: any = {
+    name: '',
+    origin: '',
     mpg: null,
     cylinders: null,
     displacement: null,
@@ -22,13 +31,15 @@ export class HomeComponent implements OnInit {
     weight: null,
     acceleration: null,
     model_year: null,
-    origin: null,
   };
   searchQuery: string = '';
   sortKey: string = 'name';
   sortOrder: string = 'asc';
   newCar: Partial<Car> = {};
   filterKeys: string[] = [];
+  filterProperty: string = '';
+  filterValue: any = '';
+  selectedFilterKey: string = '';
 
   @ViewChild('filterModal') filterModal!: TemplateRef<any>;
   @ViewChild('sortModal') sortModal!: TemplateRef<any>;
@@ -46,11 +57,13 @@ export class HomeComponent implements OnInit {
     'origin',
   ];
 
+  dataSource: MatTableDataSource<Car> = new MatTableDataSource<Car>([]);
   constructor(
     private usersService: UsersService,
     public authService: AuthService,
     private carService: CarService,
-    private dialog: MatDialog
+    private dialog: MatDialog,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
@@ -62,17 +75,36 @@ export class HomeComponent implements OnInit {
   loadCars(): void {
     this.carService.getCars().subscribe((data) => {
       this.cars = data;
+      this.filteredCars = [...this.cars];
+      this.dataSource.data = this.filteredCars;
       this.applyFilters();
     });
   }
 
   applyFilters(): void {
+    console.log(
+      'Applying filters with sortKey:',
+      this.sortKey,
+      'and sortOrder:',
+      this.sortOrder
+    );
+
+    if (!this.selectedFilterKey || !this.isValidKey(this.selectedFilterKey)) {
+      console.warn('Invalid filter key:', this.selectedFilterKey);
+    }
+
     this.filteredCars = this.cars
       .filter((car) => this.applySearch(car))
       .filter((car) => this.applyFilter(car))
       .sort(this.sortByKey.bind(this));
+    console.log('Filtered and sorted cars:', this.filteredCars);
+
+    this.dataSource.data = this.filteredCars;
+    this.cdr.detectChanges();
+    this.dialog.closeAll();
   }
 
+  onFilterKeyChange(): void {}
   applySearch(car: Car): boolean {
     const name = car.name ?? '';
     const query = this.searchQuery ?? '';
@@ -80,14 +112,42 @@ export class HomeComponent implements OnInit {
   }
 
   applyFilter(car: Car): boolean {
-    for (const key in this.filters) {
-      if (this.filters.hasOwnProperty(key) && this.filters[key] !== null) {
-        if (car[key as keyof Car] !== this.filters[key]) {
-          return false;
-        }
-      }
+    if (!this.selectedFilterKey || !this.isValidKey(this.selectedFilterKey)) {
+      return true;
     }
+
+    const filterValue = this.filters[this.selectedFilterKey];
+
+    if (this.isNumberFilter(this.selectedFilterKey)) {
+      if (filterValue === null || filterValue === undefined) {
+        return true;
+      }
+      return (car[this.selectedFilterKey as keyof Car] as number) > filterValue;
+    } else if (this.isStringFilter(this.selectedFilterKey)) {
+      return (car[this.selectedFilterKey as keyof Car] as string)
+        .toLowerCase()
+        .includes((filterValue as string).toLowerCase());
+    }
+
     return true;
+  }
+
+  isStringFilter(key: string): boolean {
+    const stringFilters = ['name', 'origin'];
+    return stringFilters.includes(key);
+  }
+
+  isNumberFilter(key: string): boolean {
+    const numberFilters = [
+      'mpg',
+      'cylinders',
+      'displacement',
+      'horsepower',
+      'weight',
+      'acceleration',
+      'model_year',
+    ];
+    return numberFilters.includes(key);
   }
 
   isValidKey(key: string): key is keyof Car {
@@ -225,18 +285,25 @@ export class HomeComponent implements OnInit {
     }
   }
 
-  resetNewCar() {
-    this.newCar = {
-      id: '',
-      name: '',
-      mpg: 0,
-      cylinders: 0,
-      displacement: 0,
-      horsepower: 0,
-      weight: 0,
-      acceleration: 0,
-      model_year: 0,
-      origin: '',
+  resetFilters(): void {
+    this.filters = {
+      mpg: null,
+      cylinders: null,
+      displacement: null,
+      horsepower: null,
+      weight: null,
+      acceleration: null,
+      model_year: null,
+      origin: null,
     };
+    this.selectedFilterKey = '';
+    this.filteredCars = [...this.cars];
+    this.applyFilters();
+  }
+  resetSort(): void {
+    this.sortKey = 'name';
+    this.sortOrder = 'asc';
+    console.log('Sort reset to:', this.sortKey, this.sortOrder);
+    this.applyFilters();
   }
 }

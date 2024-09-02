@@ -6,7 +6,7 @@
 
 .modal-footer {
   display: flex;
-  justify-content: space-between;
+  justify-content: space-around;
 }
 
 .table-container {
@@ -21,7 +21,7 @@
 }
 
 .custom-modal-dialog {
-  max-width: 1000px;
+  max-width: 10000px;
 }
 
 .custom-modal-content {
@@ -136,6 +136,12 @@ td {
   border-top: 1px solid #ddd;
 }
 
+.sort-label {
+  padding-right: 10px;
+}
+.form-group {
+  margin-bottom: 10px;
+}
 @media (max-width: 768px) {
   table {
     font-size: 12px;

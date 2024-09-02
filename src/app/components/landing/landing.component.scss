@@ -1,0 +1,23 @@
+.land-page {
+  padding-top: 50px;
+
+  justify-content: space-evenly;
+}
+
+.land-page h2 {
+  margin-top: 10 !important;
+}
+
+button {
+  background-color: blue;
+  width: 20%;
+  height: 80px;
+  color: wheat;
+  box-sizing: border-box;
+  border-radius: 20px;
+  font-size: large;
+}
+
+button:hover {
+  cursor: pointer;
+}

@@ -97,7 +97,7 @@
   <div class="modal-dialog custom-modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Filter Cars</h5>
+        <h2 class="modal-title">Filter Cars</h2>
         <button
           type="button"
           class="close"
@@ -108,20 +108,39 @@
         </button>
       </div>
       <div class="modal-body custom-modal-body">
-        <!-- Use the filterKeys array to loop through keys -->
-        <div *ngFor="let key of filterKeys">
-          <label>{{ key }}</label>
-          <input
-            type="text"
-            [(ngModel)]="filters[key]"
+        <!-- Filter Key Selection -->
+        <div class="form-group">
+          <label for="filterKey" class="filter-label">Filter By:</label>
+          <select
+            id="filterKey"
+            [(ngModel)]="selectedFilterKey"
+            (ngModelChange)="onFilterKeyChange()"
             class="form-control custom-form-control"
-            aria-label="filterKeys"
+          >
+            <option *ngFor="let key of filterKeys" [value]="key">
+              {{ key }}
+            </option>
+          </select>
+        </div>
+        <!-- Filter Value Input -->
+        <div class="form-group" *ngIf="selectedFilterKey">
+          <label for="filterValue" class="filter-label">Filter Value:</label>
+          <input
+            id="filterValue"
+            type="text"
+            [(ngModel)]="filters[selectedFilterKey]"
+            class="form-control custom-form-control"
+            [type]="isNumberFilter(selectedFilterKey) ? 'number' : 'text'"
+            aria-label="filterValue"
           />
         </div>
       </div>
       <div class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeModal()">
           Close
+        </button>
+        <button type="button" class="btn btn-danger" (click)="resetFilters()">
+          Reset Filters
         </button>
         <button type="button" class="btn btn-primary" (click)="applyFilters()">
           Apply Filters
@@ -136,7 +155,7 @@
   <div class="modal-dialog custom-modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Sort Cars</h5>
+        <h2 class="modal-title">Sort Cars</h2>
         <button
           type="button"
           class="close"
@@ -148,8 +167,8 @@
       </div>
       <div class="modal-body custom-modal-body">
         <!-- Add sort options here -->
-        <div>
-          <label for="sortKey">Sort By:</label>
+        <div class="form-group">
+          <label for="sortKey" class="sort-label">Sort By:</label>
           <select
             id="sortKey"
             [(ngModel)]="sortKey"
@@ -175,8 +194,8 @@
             </option>
           </select>
         </div>
-        <div>
-          <label for="sortOrder">Order:</label>
+        <div class="form-group">
+          <label for="sortOrder" class="sort-label">Order:</label>
           <select
             id="sortOrder"
             [(ngModel)]="sortOrder"
@@ -191,6 +210,9 @@
         <button type="button" class="btn btn-secondary" (click)="closeModal()">
           Close
         </button>
+        <button type="button" class="btn btn-danger" (click)="resetSort()">
+          Reset Sort
+        </button>
         <button type="button" class="btn btn-primary" (click)="applyFilters()">
           Apply Sort
         </button>
@@ -204,7 +226,7 @@
   <div class="modal-dialog custom-modal-dialog">
     <div class="modal-content">
       <div class="modal-header">
-        <h5 class="modal-title">Add Car</h5>
+        <h2 class="modal-title">Add Car</h2>
         <button
           type="button"
           class="close"
@@ -217,7 +239,7 @@
       <div class="modal-body custom-modal-body">
         <form (ngSubmit)="addCar()" #carForm="ngForm">
           <div class="form-group">
-            <label for="name">Name</label>
+            <label for="name" class="sort-label">Name:</label>
             <input
               type="text"
               id="name"
@@ -228,7 +250,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="mpg">MPG</label>
+            <label for="mpg" class="sort-label">MPG:</label>
             <input
               type="number"
               id="mpg"
@@ -239,7 +261,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="cylinders">Cylinders</label>
+            <label for="cylinders" class="sort-label">Cylinders:</label>
             <input
               type="number"
               id="cylinders"
@@ -250,7 +272,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="displacement">Displacement</label>
+            <label for="displacement" class="sort-label">Displacement:</label>
             <input
               type="number"
               id="displacement"
@@ -261,7 +283,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="horsepower">Horsepower</label>
+            <label for="horsepower" class="sort-label">Horsepower:</label>
             <input
               type="number"
               id="horsepower"
@@ -272,7 +294,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="weight">Weight</label>
+            <label for="weight" class="sort-label">Weight:</label>
             <input
               type="number"
               id="weight"
@@ -283,7 +305,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="acceleration">Acceleration</label>
+            <label for="acceleration" class="sort-label">Acceleration:</label>
             <input
               type="number"
               id="acceleration"
@@ -294,7 +316,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="model_year">Model Year</label>
+            <label for="model_year" class="sort-label">Model Year:</label>
             <input
               type="number"
               id="model_year"
@@ -305,7 +327,7 @@
             />
           </div>
           <div class="form-group">
-            <label for="origin">Origin</label>
+            <label for="origin" class="sort-label">Origin:</label>
             <input
               type="text"
               id="origin"
