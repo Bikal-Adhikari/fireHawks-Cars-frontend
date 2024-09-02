@@ -9,21 +9,28 @@
       (input)="applyFilters()"
     />
     <!-- Feature Buttons -->
-    <div>
+    <div class="features">
       <button class="btn btn-primary mr-2" (click)="openFilterModal()">
-        Filter
+        <i class="material-icons">filter_list</i> Filter
       </button>
       <button class="btn btn-secondary mr-2" (click)="openSortModal()">
-        Sort
+        <i class="material-icons">sort</i> Sort
       </button>
+      <!-- <button class="btn btn-secondary mr-2" (click)="resetNewCar()">
+        <i class="material-icons">refresh</i> Reset Filter
+      </button> -->
       <button class="btn btn-success mr-2" (click)="openAddDataModal()">
-        Add Data
+        <i class="material-icons">add</i> Add Data
       </button>
-      <button class="btn btn-info" (click)="exportToCSV()">Download CSV</button>
+      <button class="btn btn-info" (click)="exportToCSV()">
+        <i class="material-icons">download</i> Download CSV
+      </button>
     </div>
   </div>
+</div>
 
-  <!-- Car Data Table -->
+<!-- Car Data Table -->
+<div class="table-container">
   <table mat-table [dataSource]="filteredCars" class="mat-elevation-z8" matSort>
     <!-- Name Column -->
     <ng-container matColumnDef="name">
@@ -87,79 +94,237 @@
 
 <!-- Filter Modal -->
 <ng-template #filterModal>
-  <div class="modal-header">
-    <h5 class="modal-title">Filter Cars</h5>
-    <button
-      type="button"
-      class="close"
-      aria-label="Close"
-      (click)="closeModal()"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <!-- Use the filterKeys array to loop through keys -->
-    <div *ngFor="let key of filterKeys">
-      <label>{{ key }}</label>
-      <input
-        type="text"
-        [(ngModel)]="filters[key]"
-        class="form-control"
-        aria-label="filterKeys"
-      />
+  <div class="modal-dialog custom-modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Filter Cars</h5>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body custom-modal-body">
+        <!-- Use the filterKeys array to loop through keys -->
+        <div *ngFor="let key of filterKeys">
+          <label>{{ key }}</label>
+          <input
+            type="text"
+            [(ngModel)]="filters[key]"
+            class="form-control custom-form-control"
+            aria-label="filterKeys"
+          />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">
+          Apply Filters
+        </button>
+      </div>
     </div>
-  </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="closeModal()">
-      Close
-    </button>
-    <button type="button" class="btn btn-primary" (click)="applyFilters()">
-      Apply Filters
-    </button>
   </div>
 </ng-template>
 
 <!-- Sort Modal -->
 <ng-template #sortModal>
-  <div class="modal-header">
-    <h5 class="modal-title">Sort Cars</h5>
-    <button
-      type="button"
-      class="close"
-      aria-label="Close"
-      (click)="closeModal()"
-    >
-      <span aria-hidden="true">&times;</span>
-    </button>
-  </div>
-  <div class="modal-body">
-    <!-- Add sort options here -->
-    <div>
-      <label for="sortKey">Sort By:</label>
-      <select id="sortKey" [(ngModel)]="sortKey" class="form-control">
-        <option
-          *ngFor="let key of ['name', 'mpg', 'cylinders', 'displacement']"
-          [value]="key"
+  <div class="modal-dialog custom-modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Sort Cars</h5>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="closeModal()"
         >
-          {{ key }}
-        </option>
-      </select>
-    </div>
-    <div>
-      <label for="sortOrder">Order:</label>
-      <select id="sortOrder" [(ngModel)]="sortOrder" class="form-control">
-        <option value="asc">Ascending</option>
-        <option value="desc">Descending</option>
-      </select>
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body custom-modal-body">
+        <!-- Add sort options here -->
+        <div>
+          <label for="sortKey">Sort By:</label>
+          <select
+            id="sortKey"
+            [(ngModel)]="sortKey"
+            class="form-control custom-form-control"
+          >
+            <option
+              *ngFor="
+                let key of [
+                  'name',
+                  'mpg',
+                  'cylinders',
+                  'displacement',
+                  'horsepower',
+                  'weight',
+                  'acceleration',
+                  'model_year',
+                  'origin'
+                ]
+              "
+              [value]="key"
+            >
+              {{ key }}
+            </option>
+          </select>
+        </div>
+        <div>
+          <label for="sortOrder">Order:</label>
+          <select
+            id="sortOrder"
+            [(ngModel)]="sortOrder"
+            class="form-control custom-form-control"
+          >
+            <option value="asc">Ascending</option>
+            <option value="desc">Descending</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="applyFilters()">
+          Apply Sort
+        </button>
+      </div>
     </div>
   </div>
-  <div class="modal-footer">
-    <button type="button" class="btn btn-secondary" (click)="closeModal()">
-      Close
-    </button>
-    <button type="button" class="btn btn-primary" (click)="applyFilters()">
-      Apply Sort
-    </button>
+</ng-template>
+
+<!-- Add Data Modal -->
+<ng-template #addDataModal>
+  <div class="modal-dialog custom-modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title">Add Car</h5>
+        <button
+          type="button"
+          class="close"
+          aria-label="Close"
+          (click)="closeModal()"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body custom-modal-body">
+        <form (ngSubmit)="addCar()" #carForm="ngForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              id="name"
+              [(ngModel)]="newCar.name"
+              name="name"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="mpg">MPG</label>
+            <input
+              type="number"
+              id="mpg"
+              [(ngModel)]="newCar.mpg"
+              name="mpg"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="cylinders">Cylinders</label>
+            <input
+              type="number"
+              id="cylinders"
+              [(ngModel)]="newCar.cylinders"
+              name="cylinders"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="displacement">Displacement</label>
+            <input
+              type="number"
+              id="displacement"
+              [(ngModel)]="newCar.displacement"
+              name="displacement"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="horsepower">Horsepower</label>
+            <input
+              type="number"
+              id="horsepower"
+              [(ngModel)]="newCar.horsepower"
+              name="horsepower"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="weight">Weight</label>
+            <input
+              type="number"
+              id="weight"
+              [(ngModel)]="newCar.weight"
+              name="weight"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="acceleration">Acceleration</label>
+            <input
+              type="number"
+              id="acceleration"
+              [(ngModel)]="newCar.acceleration"
+              name="acceleration"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="model_year">Model Year</label>
+            <input
+              type="number"
+              id="model_year"
+              [(ngModel)]="newCar.model_year"
+              name="model_year"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+          <div class="form-group">
+            <label for="origin">Origin</label>
+            <input
+              type="text"
+              id="origin"
+              [(ngModel)]="newCar.origin"
+              name="origin"
+              class="form-control custom-form-control"
+              required
+            />
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          Close
+        </button>
+        <button type="button" class="btn btn-primary" (click)="addCar()">
+          Add Car
+        </button>
+      </div>
+    </div>
   </div>
 </ng-template>
