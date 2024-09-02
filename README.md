@@ -56,30 +56,30 @@ This will start the application on `http://localhost:4200`.
 
 #### Viewing Cars
 
-i. Navigate to the main page to view the list of cars.
-ii. Use the search bar to filter cars by name.
+- Navigate to the main page to view the list of cars.
+- Use the search bar to filter cars by name.
 
 #### Filtering Cars
 
-i. Open the filter modal by clicking on the filter button.
-ii. Select the filter criteria and apply the filters.
-iii. To reset filters, click on the "Reset Filters" button.
+- Open the filter modal by clicking on the filter button.
+- Select the filter criteria and apply the filters.
+- To reset filters, click on the "Reset Filters" button.
 
 #### Sorting Cars
 
-i. Open the sort modal by clicking on the sort button.
-ii. Choose the attribute to sort by and the sort order (ascending or descending).
-iii. Apply the sorting to update the car list.
+- Open the sort modal by clicking on the sort button.
+- Choose the attribute to sort by and the sort order (ascending or descending).
+- Apply the sorting to update the car list.
 
 #### Adding a New Car
 
-i. Open the add car modal by clicking on the add car button.
-ii. Fill out the form with the car details.
-iii. Submit the form to add the new car to the list.
+- Open the add car modal by clicking on the add car button.
+- Fill out the form with the car details.
+- Submit the form to add the new car to the list.
 
 #### Exporting Data
 
-i. Click on the "Export to CSV" button to download the filtered car data as a CSV file.
+- Click on the "Export to CSV" button to download the filtered car data as a CSV file.
 
 ### Contributing
 
