@@ -1,0 +1,21 @@
+mat-toolbar {
+  justify-content: space-between;
+}
+
+.content {
+  padding: 32px;
+}
+
+.profile-image-toolbar {
+  border-radius: 100%;
+  margin-right: 8px;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0;
+  width: 100%;
+  background-color: #f0f0f0;
+  padding: 10px;
+  text-align: center;
+}

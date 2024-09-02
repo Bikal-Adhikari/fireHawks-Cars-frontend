@@ -1,0 +1,18 @@
+.land-page {
+  display: flex;
+}
+
+.land-page h3 {
+  margin-top: 10 !important;
+}
+
+.land-page span {
+  background-color: blue;
+  color: white;
+  padding: 0.5rem;
+  border: 5px;
+}
+
+.land-page span:hover {
+  cursor: pointer;
+}
