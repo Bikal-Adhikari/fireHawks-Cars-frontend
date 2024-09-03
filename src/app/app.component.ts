@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { AuthService } from './services/auth.service';
 import { UsersService } from './services/users.service';
@@ -8,7 +8,7 @@ import { UsersService } from './services/users.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss'],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   user$ = this.usersService.currentUserProfile$;
 
   constructor(
@@ -16,6 +16,14 @@ export class AppComponent {
     public usersService: UsersService,
     private router: Router
   ) {}
+
+  ngOnInit(): void {
+    this.authService.currentUser$.subscribe((user) => {
+      if (user) {
+        this.router.navigate(['/home']);
+      }
+    });
+  }
 
   logout() {
     this.authService.logout().subscribe(() => {

@@ -22,7 +22,11 @@ export class LoginComponent implements OnInit {
     private fb: NonNullableFormBuilder
   ) {}
 
-  ngOnInit(): void {}
+  async ngOnInit(): Promise<void> {
+    if (await this.authService.isAuthenticated()) {
+      this.router.navigate(['/home']);
+    }
+  }
 
   get email() {
     return this.loginForm.get('email');
@@ -45,7 +49,7 @@ export class LoginComponent implements OnInit {
         this.toast.observe({
           success: 'Logged in successfully',
           loading: 'Logging in...',
-          error: ({ message }) => `There was an error: ${message} `,
+          error: ({ message }) => `There was an error: ${message}`,
         })
       )
       .subscribe(() => {

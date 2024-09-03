@@ -114,7 +114,7 @@
           <select
             id="filterKey"
             [(ngModel)]="selectedFilterKey"
-            (ngModelChange)="onFilterKeyChange()"
+            (ngModelChange)="onFilterKeyChange($event)"
             class="form-control custom-form-control"
           >
             <option *ngFor="let key of filterKeys" [value]="key">
@@ -210,7 +210,7 @@
         <button type="button" class="btn btn-secondary" (click)="closeModal()">
           Close
         </button>
-        <button type="button" class="btn btn-danger" (click)="resetSort()">
+        <button type="button" class="btn btn-danger" (click)="resetFilters()">
           Reset Sort
         </button>
         <button type="button" class="btn btn-primary" (click)="applyFilters()">

@@ -24,13 +24,13 @@ export class HomeComponent implements OnInit {
   filters: any = {
     name: '',
     origin: '',
-    mpg: null,
-    cylinders: null,
-    displacement: null,
-    horsepower: null,
-    weight: null,
-    acceleration: null,
-    model_year: null,
+    mpg: 0,
+    cylinders: 0,
+    displacement: 0,
+    horsepower: 0,
+    weight: 0,
+    acceleration: 0,
+    model_year: 0,
   };
   searchQuery: string = '';
   sortKey: string = 'name';
@@ -58,6 +58,7 @@ export class HomeComponent implements OnInit {
   ];
 
   dataSource: MatTableDataSource<Car> = new MatTableDataSource<Car>([]);
+
   constructor(
     private usersService: UsersService,
     public authService: AuthService,
@@ -81,19 +82,53 @@ export class HomeComponent implements OnInit {
     });
   }
 
-  applyFilters(): void {
-    console.log(
-      'Applying filters with sortKey:',
-      this.sortKey,
-      'and sortOrder:',
-      this.sortOrder
-    );
+  applyFilters(filters?: any): void {
+    const validKeys = [
+      'name',
+      'origin',
+      'mpg',
+      'cylinders',
+      'displacement',
+      'horsepower',
+      'model_year',
+      'weight',
+    ];
 
-    if (!this.selectedFilterKey || !this.isValidKey(this.selectedFilterKey)) {
-      console.warn('Invalid filter key:', this.selectedFilterKey);
+    const filtersToApply = filters || this.filters || {};
+
+    if (typeof filtersToApply !== 'object' || filtersToApply === null) {
+      console.warn('Invalid filters provided:', filtersToApply);
+      return;
     }
 
-    this.filteredCars = this.cars
+    const filterEntries = Object.entries(filtersToApply).filter(
+      ([key, value]) => {
+        return validKeys.includes(key) && value !== null && value !== '';
+      }
+    );
+
+    const appliedFilters = filterEntries.reduce((acc: any, [key, value]) => {
+      acc[key] = value;
+      return acc;
+    }, {});
+
+    console.log('Applying filters:', Object.keys(appliedFilters).length);
+
+    if (Object.keys(appliedFilters).length > 0) {
+      this.filteredCars = this.cars.filter((car) => {
+        return Object.keys(appliedFilters).every((key) => {
+          this.selectedFilterKey = key;
+          this.filters[this.selectedFilterKey] = appliedFilters[key];
+          return this.applyFilter(car);
+        });
+      });
+    } else {
+      this.filteredCars = [...this.cars];
+    }
+
+    console.log('Filtered cars after applying filters:', this.filteredCars);
+
+    this.filteredCars = this.filteredCars
       .filter((car) => this.applySearch(car))
       .filter((car) => this.applyFilter(car))
       .sort(this.sortByKey.bind(this));
@@ -102,9 +137,9 @@ export class HomeComponent implements OnInit {
     this.dataSource.data = this.filteredCars;
     this.cdr.detectChanges();
     this.dialog.closeAll();
+    this.storeFiltersInLocalStorage();
   }
 
-  onFilterKeyChange(): void {}
   applySearch(car: Car): boolean {
     const name = car.name ?? '';
     const query = this.searchQuery ?? '';
@@ -122,7 +157,10 @@ export class HomeComponent implements OnInit {
       if (filterValue === null || filterValue === undefined) {
         return true;
       }
-      return (car[this.selectedFilterKey as keyof Car] as number) > filterValue;
+      return (
+        (car[this.selectedFilterKey as keyof Car] as number) >=
+        parseFloat(filterValue as string)
+      );
     } else if (this.isStringFilter(this.selectedFilterKey)) {
       return (car[this.selectedFilterKey as keyof Car] as string)
         .toLowerCase()
@@ -164,7 +202,17 @@ export class HomeComponent implements OnInit {
     ].includes(key);
   }
 
+  onFilterKeyChange(selectedKey: string): void {
+    this.selectedFilterKey = selectedKey;
+    // this.filters[this.selectedFilterKey] = null;
+  }
+
   sortByKey(a: Car, b: Car): number {
+    if (!this.isValidKey(this.sortKey)) {
+      console.warn('Invalid sort key used:', this.sortKey);
+      return 0;
+    }
+
     const key = this.sortKey as keyof Car;
     const order = this.sortOrder === 'asc' ? 1 : -1;
 
@@ -187,13 +235,13 @@ export class HomeComponent implements OnInit {
   openAddDataModal(): void {
     this.newCar = {
       name: '',
-      mpg: NaN,
-      cylinders: NaN,
-      displacement: NaN,
-      horsepower: NaN,
-      weight: NaN,
-      acceleration: NaN,
-      model_year: NaN,
+      mpg: 0,
+      cylinders: 0,
+      displacement: 0,
+      horsepower: 0,
+      weight: 0,
+      acceleration: 0,
+      model_year: 0,
       origin: '',
     };
     this.dialog.open(this.addDataModal);
@@ -207,14 +255,45 @@ export class HomeComponent implements OnInit {
     localStorage.setItem('carFilters', JSON.stringify(this.filters));
     localStorage.setItem('searchQuery', this.searchQuery);
     localStorage.setItem('sortKey', this.sortKey);
+    localStorage.setItem('sortOrder', this.sortOrder);
   }
 
   loadFiltersFromLocalStorage(): void {
     const filters = localStorage.getItem('carFilters');
-    if (filters) this.filters = JSON.parse(filters);
+    if (filters) {
+      try {
+        const parsedFilters = JSON.parse(filters);
+        Object.keys(parsedFilters).forEach((key) => {
+          if (this.isNumberFilter(key)) {
+            const filterValue = parsedFilters[key];
+            if (filterValue !== null && filterValue !== undefined) {
+              parsedFilters[key] = Number(filterValue);
+            }
+          }
+        });
+        this.filters = parsedFilters;
+      } catch (error) {
+        console.error('Error parsing filters from localStorage:', error);
+        this.filters = {};
+      }
+    } else {
+      this.filters = {};
+    }
+
+    console.log('Loaded filters:', this.filters);
+
+    this.selectedFilterKey = this.filters;
     this.searchQuery = localStorage.getItem('searchQuery') || '';
     this.sortKey = localStorage.getItem('sortKey') || 'name';
-    this.applyFilters();
+    this.sortOrder = localStorage.getItem('sortOrder') || 'asc';
+
+    if (!this.isValidKey(this.sortKey)) {
+      console.warn('Invalid sortKey:', this.sortKey);
+      this.sortKey = 'name';
+    }
+
+    // Pass the filters to applyFilters
+    this.applyFilters(this.filters);
   }
 
   exportToCSV(): void {
@@ -273,37 +352,36 @@ export class HomeComponent implements OnInit {
         origin: this.newCar.origin,
       };
 
-      this.carService.addCar(carToAdd).subscribe((newCar) => {
-        this.cars.push(newCar);
-        this.filteredCars = [...this.cars];
+      this.carService.addCar(carToAdd).subscribe((car) => {
+        this.cars.push(car);
+        this.filteredCars.push(car);
         this.applyFilters();
       });
 
-      this.dialog.closeAll();
+      this.closeModal();
     } else {
-      alert('Please fill out all fields before submitting.');
+      alert('Please fill all fields.');
     }
   }
 
   resetFilters(): void {
     this.filters = {
-      mpg: null,
-      cylinders: null,
-      displacement: null,
-      horsepower: null,
-      weight: null,
-      acceleration: null,
-      model_year: null,
-      origin: null,
+      name: '',
+      origin: '',
+      mpg: 0,
+      cylinders: 0,
+      displacement: 0,
+      horsepower: 0,
+      weight: 0,
+      acceleration: 0,
+      model_year: 0,
     };
-    this.selectedFilterKey = '';
-    this.filteredCars = [...this.cars];
-    this.applyFilters();
-  }
-  resetSort(): void {
+
+    this.searchQuery = '';
+
     this.sortKey = 'name';
     this.sortOrder = 'asc';
-    console.log('Sort reset to:', this.sortKey, this.sortOrder);
+
     this.applyFilters();
   }
 }
