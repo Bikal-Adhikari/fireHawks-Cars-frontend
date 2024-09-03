@@ -204,7 +204,7 @@ export class HomeComponent implements OnInit {
 
   onFilterKeyChange(selectedKey: string): void {
     this.selectedFilterKey = selectedKey;
-    // this.filters[this.selectedFilterKey] = null;
+    this.filters[this.selectedFilterKey] = null;
   }
 
   sortByKey(a: Car, b: Car): number {
